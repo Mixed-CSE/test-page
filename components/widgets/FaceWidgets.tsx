@@ -85,7 +85,6 @@ export function FaceWidgets({ onCalibrate }: FaceWidgetsProps) {
     setStatus("");
     const response = JSON.parse(event.data);
     let emotionArray = [];
-    console.log(response);
     const response2 = response.face.predictions;
 
     for (var object in response2) {
@@ -298,6 +297,18 @@ export function FaceWidgets({ onCalibrate }: FaceWidgetsProps) {
         </div>
         <canvas className="hidden" ref={photoRef}></canvas>
       </div>
+      {statisticResult < 50 && (
+        <div className="flex flex-col items-center justify-center">
+          <div
+            className="absolute text-center"
+            style={{ fontWeight: 600, fontSize: "50px", color: "white", backgroundColor: "red" }}
+          >
+            비상입니다, 교수님...<br></br>
+            절반 이상이 이해하지 못하고 있습니다...
+          </div>
+          <audio src="/emergency.mp3" typeof="audio/mpeg" autoPlay></audio>
+        </div>
+      )}
       <div className="mt-80 text-center" style={{ fontSize: "100px", color: "white" }}>
         {statisticResult}%가 끄덕이는 중
       </div>

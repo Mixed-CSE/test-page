@@ -13,9 +13,9 @@ export default function App({ Component, pageProps }: AppProps) {
   return (
     <>
       <Head>
-        <title>이해했니?</title>
-        <meta name="title" content="이해했니?" />
-        <meta name="description" content="이해했니?" />
+        <title>알아들었으면 끄덕여</title>
+        <meta name="title" content="알아들었으면 끄덕여" />
+        <meta name="description" content="알아들었으면 끄덕여?" />
         <link rel="icon" href="/screaming.png" />
       </Head>
 
