@@ -3,16 +3,12 @@ import { None, Optional } from "../../lib/utilities/typeUtilities";
 import { useContext, useEffect, useRef, useState } from "react";
 
 import { AuthContext } from "../menu/Auth";
-import { Descriptor } from "./Descriptor";
 import { FacePrediction } from "../../lib/data/facePrediction";
 import { FaceTrackedVideo } from "./FaceTrackedVideo";
-import { LoaderSet } from "./LoaderSet";
-import { TopEmotions } from "./TopEmotions";
 import { TrackedFace } from "../../lib/data/trackedFace";
 import { VideoRecorder } from "../../lib/media/videoRecorder";
 import { blobToBase64 } from "../../lib/utilities/blobUtilities";
 import { getApiUrlWs } from "../../lib/utilities/environmentUtilities";
-import { json } from "stream/consumers";
 
 type FaceWidgetsProps = {
   onCalibrate: Optional<(emotions: Emotion[]) => void>;
@@ -123,7 +119,6 @@ export function FaceWidgets({ onCalibrate }: FaceWidgetsProps) {
     // 이부분이다아아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙
     // 이부분이다아아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙
     // 이부분이다아아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙
-    // 이부분이다아아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙
     const newTrackedFaces: TrackedFace[] = [];
     predictions.forEach(async (pred: FacePrediction, dataIndex: number) => {
       // 감정벡터 추출 작업
@@ -165,14 +160,13 @@ export function FaceWidgets({ onCalibrate }: FaceWidgetsProps) {
         .then((response) => response.text())
         .then((result) => {
           result = JSON.parse(result);
-          console.log(parseInt(result["result"]));
-          isUnderstanding = parseInt(result["result"]);
-          console.log(isUnderstanding == 1);
+          isUnderstanding = result["result"];
           if (isUnderstanding == 1) {
-            newTrackedFaces.push({ boundingBox: pred.bbox, color: "rgb(0, 255, 0, 0.5)" });
+            color = "rgb(0, 255, 0, 0.5)";
           } else {
-            newTrackedFaces.push({ boundingBox: pred.bbox, color: "rgb(255, 0, 0, 0.5)" });
+            color = "rgb(255, 0, 0, 0.5)";
           }
+          newTrackedFaces.push({ boundingBox: pred.bbox, color: color });
           if (dataIndex === 0) {
             const newEmotions = pred.emotions;
             setEmotions(newEmotions);
@@ -302,20 +296,7 @@ export function FaceWidgets({ onCalibrate }: FaceWidgetsProps) {
           width={1000}
           height={750}
         />
-        {!onCalibrate && (
-          <div className="ml-10">
-            <TopEmotions emotions={emotions} />
-            <LoaderSet
-              className="mt-8 ml-5"
-              emotionNames={loaderNames}
-              emotions={emotions}
-              numLevels={numLoaderLevels}
-            />
-            <Descriptor className="mt-8" emotions={emotions} />
-          </div>
-        )}
       </div>
-
       <div className="pt-6">{status}</div>
       <canvas className="hidden" ref={photoRef}></canvas>
     </div>

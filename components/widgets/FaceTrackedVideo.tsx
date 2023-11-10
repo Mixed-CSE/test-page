@@ -48,13 +48,7 @@ export function FaceTrackedVideo({ className, trackedFaces, onVideoReady, width,
       graphics.fillRect(0, 0, canvasElement.width, canvasElement.height);
     }
 
-    // 이부분이다아아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙
-    // 이부분이다아아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙
-    // 이부분이다아아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙
-    // 이부분이다아아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙
-
     trackedFaces.forEach(async (trackedFace: TrackedFace) => {
-      console.log(trackedFace);
       const bbox = trackedFace.boundingBox;
       const color = trackedFace.color;
       const scale = 20;
