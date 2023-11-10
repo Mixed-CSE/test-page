@@ -160,6 +160,7 @@ export function FaceWidgets({ onCalibrate }: FaceWidgetsProps) {
 
       let isUnderstanding = 1;
       let color = "rgb(0, 255, 0, 0.5)";
+
       fetch("http://localhost:8104/predict", requestOptions)
         .then((response) => response.text())
         .then((result) => {
@@ -167,20 +168,19 @@ export function FaceWidgets({ onCalibrate }: FaceWidgetsProps) {
           console.log(parseInt(result["result"]));
           isUnderstanding = parseInt(result["result"]);
           console.log(isUnderstanding == 1);
+          if (isUnderstanding == 1) {
+            newTrackedFaces.push({ boundingBox: pred.bbox, color: "rgb(0, 255, 0, 0.5)" });
+          } else {
+            newTrackedFaces.push({ boundingBox: pred.bbox, color: "rgb(255, 0, 0, 0.5)" });
+          }
+          if (dataIndex === 0) {
+            const newEmotions = pred.emotions;
+            setEmotions(newEmotions);
+            if (onCalibrate) {
+              onCalibrate(newEmotions);
+            }
+          }
         });
-      if (isUnderstanding == 1) {
-        newTrackedFaces.push({ boundingBox: pred.bbox, color: "rgb(0, 255, 0, 0.5)" });
-      } else {
-        newTrackedFaces.push({ boundingBox: pred.bbox, color: "rgb(255, 0, 0, 0.5)" });
-      }
-
-      if (dataIndex === 0) {
-        const newEmotions = pred.emotions;
-        setEmotions(newEmotions);
-        if (onCalibrate) {
-          onCalibrate(newEmotions);
-        }
-      }
     });
     setTrackedFaces(newTrackedFaces);
 
