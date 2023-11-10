@@ -132,7 +132,7 @@ export function FaceWidgets({ onCalibrate }: FaceWidgetsProps) {
         emotionArray2.push(pred.emotions[obj].score);
       }
 
-      console.log("추출한 감정 벡터: ", emotionArray2);
+      // console.log("추출한 감정 벡터: ", emotionArray2);
 
       /* 
       구현해야 할 코드
@@ -144,7 +144,7 @@ export function FaceWidgets({ onCalibrate }: FaceWidgetsProps) {
 
       // 배열을 JSON 문자열로 변환
       const jsonString = JSON.stringify(emotionArray2);
-      console.log("이게 보내질거얌", { data: jsonString });
+      // console.log("이게 보내질거얌", { data: jsonString });
       // 서버 URL 설정
       var myHeaders = new Headers();
       myHeaders.append("Content-Type", "application/json");
@@ -158,15 +158,21 @@ export function FaceWidgets({ onCalibrate }: FaceWidgetsProps) {
         redirect: "follow",
       };
 
+      let isUnderstanding = 1;
+      let color = "rgb(0, 255, 0, 0.5)";
       fetch("http://localhost:8104/predict", requestOptions)
         .then((response) => response.text())
-        .then((result) => console.log(result));
-
-      let isUnderstanding = emotionArray2[0] > 0.1;
-      //= 호출함수(emotionArray2);
-
-      if (isUnderstanding) newTrackedFaces.push({ boundingBox: pred.bbox, color: "rgb(0, 255, 0, 0.5)" });
-      else newTrackedFaces.push({ boundingBox: pred.bbox, color: "rgb(255, 0, 0, 0.5)" });
+        .then((result) => {
+          result = JSON.parse(result);
+          console.log(parseInt(result["result"]));
+          isUnderstanding = parseInt(result["result"]);
+          console.log(isUnderstanding == 1);
+        });
+      if (isUnderstanding == 1) {
+        newTrackedFaces.push({ boundingBox: pred.bbox, color: "rgb(0, 255, 0, 0.5)" });
+      } else {
+        newTrackedFaces.push({ boundingBox: pred.bbox, color: "rgb(255, 0, 0, 0.5)" });
+      }
 
       if (dataIndex === 0) {
         const newEmotions = pred.emotions;
