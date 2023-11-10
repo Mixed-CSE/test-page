@@ -12,13 +12,10 @@ import { TrackedFace } from "../../lib/data/trackedFace";
 import { VideoRecorder } from "../../lib/media/videoRecorder";
 import { blobToBase64 } from "../../lib/utilities/blobUtilities";
 import { getApiUrlWs } from "../../lib/utilities/environmentUtilities";
-import { randomInt } from "crypto";
 
 type FaceWidgetsProps = {
   onCalibrate: Optional<(emotions: Emotion[]) => void>;
 };
-
-let globalResult = [];
 
 export function FaceWidgets({ onCalibrate }: FaceWidgetsProps) {
   const authContext = useContext(AuthContext);
@@ -94,7 +91,7 @@ export function FaceWidgets({ onCalibrate }: FaceWidgetsProps) {
     setStatus("");
     const response = JSON.parse(event.data);
     let emotionArray = [];
-
+    console.log(response);
     const response2 = response.face.predictions;
 
     for (var object in response2) {
@@ -102,8 +99,8 @@ export function FaceWidgets({ onCalibrate }: FaceWidgetsProps) {
       for (var obj in response3) {
         emotionArray.push(response3[obj].score);
       }
-      globalResult.push([emotionArray, parseInt(location.port) - 3001]);
     }
+
     const predictions: FacePrediction[] = response.face?.predictions || [];
     const warning = response.face?.warning || "";
     const error = response.error;
@@ -119,6 +116,11 @@ export function FaceWidgets({ onCalibrate }: FaceWidgetsProps) {
       setEmotions([]);
     }
 
+    // 이부분이다아아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙
+    // 이부분이다아아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙
+    // 이부분이다아아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙
+    // 이부분이다아아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙
+    // 이부분이다아아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙
     const newTrackedFaces: TrackedFace[] = [];
     predictions.forEach(async (pred: FacePrediction, dataIndex: number) => {
       newTrackedFaces.push({ boundingBox: pred.bbox });
@@ -175,22 +177,6 @@ export function FaceWidgets({ onCalibrate }: FaceWidgetsProps) {
       console.log("Stopping recorder");
       recorder.stopRecording();
       recorderRef.current = null;
-      var today = new Date();
-
-      var hours = ("0" + today.getHours()).slice(-2);
-      var minutes = ("0" + today.getMinutes()).slice(-2);
-      var seconds = ("0" + today.getSeconds()).slice(-2);
-
-      var timeString = hours + "-" + minutes + "-" + seconds;
-      // 텍스트를 파일로 저장 (웹 브라우저 환경에서 사용)
-      const blob = new Blob([JSON.stringify(globalResult)], { type: "text/plain" });
-      const a = document.createElement("a");
-      a.href = URL.createObjectURL(blob);
-      a.download = "globalResult-" + timeString + ".txt";
-      a.style.display = "none";
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
     } else {
       console.warn("Could not stop recorder, not initialized yet");
     }
