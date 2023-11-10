@@ -16,6 +16,13 @@ type FaceWidgetsProps = {
 
 let mode = ""; // 실전에서는 이 부분을 고치시오.
 
+var stored_data = [];
+let statisticResult = 0;
+
+let add = function (arr) {
+  return arr.reduce((a, b) => parseInt(a) + parseInt(b), 0);
+};
+
 export function FaceWidgets({ onCalibrate }: FaceWidgetsProps) {
   const authContext = useContext(AuthContext);
   const socketRef = useRef<WebSocket | null>(null);
@@ -27,19 +34,7 @@ export function FaceWidgets({ onCalibrate }: FaceWidgetsProps) {
   const [trackedFaces, setTrackedFaces] = useState<TrackedFace[]>([]); // [bbox, color]의 배열
   const [emotions, setEmotions] = useState<Emotion[]>([]);
   const [status, setStatus] = useState("");
-  const numLoaderLevels = 5;
   const maxReconnects = 3;
-  const loaderNames: EmotionName[] = [
-    "Calmness",
-    "Joy",
-    "Amusement",
-    "Anger",
-    "Confusion",
-    "Disgust",
-    "Sadness",
-    "Horror",
-    "Surprise (negative)",
-  ];
 
   useEffect(() => {
     console.log("Mounting component");
@@ -115,10 +110,6 @@ export function FaceWidgets({ onCalibrate }: FaceWidgetsProps) {
       setEmotions([]);
     }
 
-    // 이부분이다아아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙
-    // 이부분이다아아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙
-    // 이부분이다아아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙
-    // 이부분이다아아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙
     const newTrackedFaces: TrackedFace[] = [];
     predictions.forEach(async (pred: FacePrediction, dataIndex: number) => {
       // 감정벡터 추출 작업
@@ -161,6 +152,13 @@ export function FaceWidgets({ onCalibrate }: FaceWidgetsProps) {
         .then((result) => {
           result = JSON.parse(result);
           isUnderstanding = result["result"];
+          if (stored_data.length < 30) stored_data.push(isUnderstanding);
+          else {
+            stored_data.shift();
+            stored_data.push(isUnderstanding);
+          }
+          statisticResult = parseInt((add(stored_data) / stored_data.length) * 100);
+          // console.log("stored_data", add(stored_data));
           if (isUnderstanding == 1) {
             color = "rgb(0, 255, 0, 0.5)";
           } else {
@@ -288,17 +286,21 @@ export function FaceWidgets({ onCalibrate }: FaceWidgetsProps) {
 
   return (
     <div>
-      <div className="md:flex">
-        <FaceTrackedVideo
-          className="mb-6"
-          onVideoReady={onVideoReady}
-          trackedFaces={trackedFaces} // 이부분이당
-          width={1000}
-          height={750}
-        />
+      <div>
+        <div>
+          <FaceTrackedVideo
+            className="mb-6"
+            onVideoReady={onVideoReady}
+            trackedFaces={trackedFaces} // 이부분이당
+            width={800}
+            height={600}
+          />
+        </div>
+        <canvas className="hidden" ref={photoRef}></canvas>
       </div>
-      <div className="pt-6">{status}</div>
-      <canvas className="hidden" ref={photoRef}></canvas>
+      <div className="mt-80 text-center" style={{ fontSize: "100px", color: "white" }}>
+        {statisticResult}%가 끄덕이는 중
+      </div>
     </div>
   );
 }
