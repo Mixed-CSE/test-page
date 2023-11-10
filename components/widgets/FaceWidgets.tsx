@@ -12,10 +12,13 @@ import { TrackedFace } from "../../lib/data/trackedFace";
 import { VideoRecorder } from "../../lib/media/videoRecorder";
 import { blobToBase64 } from "../../lib/utilities/blobUtilities";
 import { getApiUrlWs } from "../../lib/utilities/environmentUtilities";
+import { json } from "stream/consumers";
 
 type FaceWidgetsProps = {
   onCalibrate: Optional<(emotions: Emotion[]) => void>;
 };
+
+let mode = ""; // 실전에서는 이 부분을 고치시오.
 
 export function FaceWidgets({ onCalibrate }: FaceWidgetsProps) {
   const authContext = useContext(AuthContext);
@@ -25,7 +28,7 @@ export function FaceWidgets({ onCalibrate }: FaceWidgetsProps) {
   const mountRef = useRef(true);
   const recorderCreated = useRef(false);
   const numReconnects = useRef(0);
-  const [trackedFaces, setTrackedFaces] = useState<TrackedFace[]>([]);
+  const [trackedFaces, setTrackedFaces] = useState<TrackedFace[]>([]); // [bbox, color]의 배열
   const [emotions, setEmotions] = useState<Emotion[]>([]);
   const [status, setStatus] = useState("");
   const numLoaderLevels = 5;
@@ -61,7 +64,7 @@ export function FaceWidgets({ onCalibrate }: FaceWidgetsProps) {
     } else {
       const baseUrl = getApiUrlWs(authContext.environment);
       const endpointUrl = `${baseUrl}/v0/stream/models`;
-      const socketUrl = `${endpointUrl}?apikey=${authContext.key}`;
+      const socketUrl = `${endpointUrl}?apikey=${authContext.key}` + mode;
       console.log(`Connecting to websocket... (using ${endpointUrl})`);
       setStatus(`Connecting to server...`);
 
@@ -123,7 +126,48 @@ export function FaceWidgets({ onCalibrate }: FaceWidgetsProps) {
     // 이부분이다아아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙아아앙
     const newTrackedFaces: TrackedFace[] = [];
     predictions.forEach(async (pred: FacePrediction, dataIndex: number) => {
-      newTrackedFaces.push({ boundingBox: pred.bbox });
+      // 감정벡터 추출 작업
+      let emotionArray2 = [];
+      for (var obj in pred.emotions) {
+        emotionArray2.push(pred.emotions[obj].score);
+      }
+
+      console.log("추출한 감정 벡터: ", emotionArray2);
+
+      /* 
+      구현해야 할 코드
+      : 감정 벡터(emotionArray)를 모델의 입력값으로 넣어서 0 또는 1을 받아온다.
+      */ // axios 모듈 가져오기
+      const axios = require("axios");
+
+      // 보낼 배열 데이터
+
+      // 배열을 JSON 문자열로 변환
+      const jsonString = JSON.stringify(emotionArray2);
+      console.log("이게 보내질거얌", { data: jsonString });
+      // 서버 URL 설정
+      var myHeaders = new Headers();
+      myHeaders.append("Content-Type", "application/json");
+
+      var raw = JSON.stringify({ data: jsonString });
+
+      var requestOptions = {
+        method: "POST",
+        headers: myHeaders,
+        body: raw,
+        redirect: "follow",
+      };
+
+      fetch("http://localhost:8104/predict", requestOptions)
+        .then((response) => response.text())
+        .then((result) => console.log(result));
+
+      let isUnderstanding = emotionArray2[0] > 0.1;
+      //= 호출함수(emotionArray2);
+
+      if (isUnderstanding) newTrackedFaces.push({ boundingBox: pred.bbox, color: "rgb(0, 255, 0, 0.5)" });
+      else newTrackedFaces.push({ boundingBox: pred.bbox, color: "rgb(255, 0, 0, 0.5)" });
+
       if (dataIndex === 0) {
         const newEmotions = pred.emotions;
         setEmotions(newEmotions);
@@ -248,9 +292,9 @@ export function FaceWidgets({ onCalibrate }: FaceWidgetsProps) {
         <FaceTrackedVideo
           className="mb-6"
           onVideoReady={onVideoReady}
-          trackedFaces={trackedFaces}
-          width={500}
-          height={375}
+          trackedFaces={trackedFaces} // 이부분이당
+          width={1000}
+          height={750}
         />
         {!onCalibrate && (
           <div className="ml-10">
