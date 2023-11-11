@@ -151,7 +151,7 @@ export function FaceWidgets({ onCalibrate }: FaceWidgetsProps) {
         .then((result) => {
           result = JSON.parse(result);
           isUnderstanding = result["result"];
-          if (stored_data.length < 30) stored_data.push(isUnderstanding);
+          if (stored_data.length < 20) stored_data.push(isUnderstanding);
           else {
             stored_data.shift();
             stored_data.push(isUnderstanding);
@@ -297,7 +297,7 @@ export function FaceWidgets({ onCalibrate }: FaceWidgetsProps) {
         </div>
         <canvas className="hidden" ref={photoRef}></canvas>
       </div>
-      {statisticResult < 50 && (
+      {statisticResult < 50 && stored_data.length >= 10 && (
         <div className="flex flex-col items-center justify-center">
           <div
             className="absolute text-center"
@@ -309,8 +309,8 @@ export function FaceWidgets({ onCalibrate }: FaceWidgetsProps) {
           <audio src="/emergency.mp3" typeof="audio/mpeg" autoPlay></audio>
         </div>
       )}
-      <div className="mt-80 text-center" style={{ fontSize: "100px", color: "white" }}>
-        {statisticResult}%가 끄덕이는 중
+      <div className="mt-80 text-center" style={{ fontWeight: "600", fontSize: "70px", color: "white" }}>
+        {statisticResult}%가 이해하는 중
       </div>
     </div>
   );
