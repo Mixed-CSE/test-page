@@ -74,8 +74,8 @@ export function FaceTrackedVideo({ className, trackedFaces, onVideoReady, width,
   }
 
   return (
-    <div>
-      <video className="absolute -scale-x-[1] content-center" ref={videoRef} autoPlay playsInline></video>
+    <div className="flex flex-col items-center justify-center pt-80">
+      <video className="absolute -scale-x-[1] scroll-mt-96" ref={videoRef} autoPlay playsInline></video>
       <canvas className="absolute" ref={canvasRef}></canvas>
     </div>
   );

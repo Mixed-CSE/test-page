@@ -46,7 +46,7 @@ export class VideoRecorder {
       videoElement.addEventListener(
         "canplay",
         () => {
-          const videoWidth = 1000;
+          const videoWidth = 800;
           const videoHeight = (videoElement.videoHeight * videoWidth) / videoElement.videoWidth;
 
           videoElement.setAttribute("width", videoWidth.toString());
